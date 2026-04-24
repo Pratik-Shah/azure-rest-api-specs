@@ -234,6 +234,9 @@ model DiscoveryToolReference {
   @doc("The resource ID of the tool.")
   toolId: ToolId;
 
+  @doc("The display name of the tool.")
+  name?: string;
+
   @doc("Whether user confirmation is required before tool execution.")
   confirmation?: DiscoveryConfirmationState;
 }
@@ -243,6 +246,9 @@ model DiscoveryToolReference {
 model DiscoveryKnowledgeBaseReference {
   @doc("The resource ID of the knowledge base.")
   knowledgeBaseId: string;
+
+  @doc("The display name of the knowledge base.")
+  name?: string;
 }
 
 // ============================================================================

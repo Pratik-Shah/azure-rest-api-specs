@@ -555,7 +555,7 @@ model ResponseItemList {
 
   @doc("The list of input items.")
   @pageItems
-  data: OpenAI.OutputItem[];
+  data: OpenAI.ItemResource[];
 
   @doc("The first ID represented in this list.")
   first_id?: string;
@@ -596,7 +596,7 @@ interface ConversationResponses {
     OpenAI.Response
   >;
 
-  #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Need paged result with Foundry v1 OutputItem"
+  #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Need paged result with Foundry v1 ItemResource"
   @doc("Get input items for a Response. Returns the OpenAI ResponseItemList with Discovery extensions containing storage assets.")
   @get
   @route("/conversations/{conversationName}/openai/v1/responses/{responseId}/inputs")
@@ -625,7 +625,7 @@ interface ConversationResponses {
 
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Need custom route and OpenAI.Response return type"
   @doc("Cancels an in-progress Response.")
-  @route("/conversations/{conversationName}/openai/v1/responses/{responseId}/cancel")
+  @route("/conversations/{conversationName}/openai/v1/responses/{responseId}:cancel")
   @post
   cancelResponse is Azure.Core.Foundations.Operation<
     {

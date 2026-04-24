@@ -202,12 +202,29 @@ model CompactResource {
   }
 );
 
+// Extend OpenAI.ItemResource with Foundry v1 fields (input items returned by /inputs endpoint)
+#suppress "@azure-tools/typespec-azure-core/experimental-feature" "Using experimental copyProperties for Foundry v1 extensions"
+@@copyProperties(OpenAI.ItemResource,
+  {
+    @doc("The agent that created the item.")
+    @added(Versions.`2026-06-01`)
+    agent_reference?: FoundryAgentReference,
+
+    @doc("The response on which the item is created.")
+    @added(Versions.`2026-06-01`)
+    response_id?: string,
+  }
+);
+
 // Extend item type unions with Foundry v1 types
 #suppress "@azure-tools/typespec-azure-core/experimental-feature" "Using experimental copyVariants for Foundry v1 item types"
 @@copyVariants(OpenAI.ItemType, FoundryItemType);
 
 #suppress "@azure-tools/typespec-azure-core/experimental-feature" "Using experimental copyVariants for Foundry v1 item types"
 @@copyVariants(OpenAI.OutputItemType, FoundryItemType);
+
+#suppress "@azure-tools/typespec-azure-core/experimental-feature" "Using experimental copyVariants for Foundry v1 item types"
+@@copyVariants(OpenAI.ItemResourceType, FoundryItemType);
 
 // ============================================================================
 // Foundry v1 Agent Models (for Discovery Agent wrapper)

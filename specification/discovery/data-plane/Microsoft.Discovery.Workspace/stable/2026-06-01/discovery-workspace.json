@@ -4742,6 +4742,36 @@
       ],
       "x-ms-discriminator-value": "computer_screenshot"
     },
+    "OpenAI.ComputerScreenshotImage": {
+      "type": "object",
+      "description": "A computer screenshot image used with the computer use tool.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Specifies the event type. For a computer screenshot, this property is\n  always set to `computer_screenshot`.",
+          "default": "computer_screenshot",
+          "enum": [
+            "computer_screenshot"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          },
+          "x-stainless-const": true
+        },
+        "image_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "The URL of the screenshot image."
+        },
+        "file_id": {
+          "type": "string",
+          "description": "The identifier of an uploaded file that contains the screenshot."
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
     "OpenAI.ComputerUsePreviewTool": {
       "type": "object",
       "title": "Computer use preview",
@@ -5822,6 +5852,109 @@
         "data"
       ]
     },
+    "OpenAI.InputContent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/OpenAI.InputContentType"
+        }
+      },
+      "discriminator": "type",
+      "required": [
+        "type"
+      ]
+    },
+    "OpenAI.InputContentInputFileContent": {
+      "type": "object",
+      "title": "Input file",
+      "description": "A file input to the model.",
+      "properties": {
+        "file_id": {
+          "type": "string",
+          "x-nullable": true
+        },
+        "filename": {
+          "type": "string",
+          "description": "The name of the file to be sent to the model."
+        },
+        "file_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "The URL of the file to be sent to the model."
+        },
+        "file_data": {
+          "type": "string",
+          "description": "The content of the file to be sent to the model."
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.InputContent"
+        }
+      ],
+      "x-ms-discriminator-value": "input_file"
+    },
+    "OpenAI.InputContentInputImageContent": {
+      "type": "object",
+      "title": "Input image",
+      "description": "An image input to the model. Learn about [image inputs](/docs/guides/vision).",
+      "properties": {
+        "image_url": {
+          "type": "string",
+          "format": "uri",
+          "x-nullable": true
+        },
+        "file_id": {
+          "type": "string",
+          "x-nullable": true
+        },
+        "detail": {
+          "$ref": "#/definitions/OpenAI.ImageDetail",
+          "description": "The detail level of the image to be sent to the model. One of `high`, `low`, or `auto`. Defaults to `auto`."
+        }
+      },
+      "required": [
+        "detail"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.InputContent"
+        }
+      ],
+      "x-ms-discriminator-value": "input_image"
+    },
+    "OpenAI.InputContentInputTextContent": {
+      "type": "object",
+      "title": "Input text",
+      "description": "A text input to the model.",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "The text input to the model."
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.InputContent"
+        }
+      ],
+      "x-ms-discriminator-value": "input_text"
+    },
+    "OpenAI.InputContentType": {
+      "type": "string",
+      "enum": [
+        "input_text",
+        "input_image",
+        "input_file"
+      ],
+      "x-ms-enum": {
+        "name": "InputContentType",
+        "modelAsString": true
+      }
+    },
     "OpenAI.InputFidelity": {
       "type": "string",
       "description": "Control how much effort the model will exert to match the style and features, especially facial features, of input images. This parameter is only supported for `gpt-image-1` and `gpt-image-1.5` and later models, unsupported for `gpt-image-1-mini`. Supports `high` and `low`. Defaults to `low`.",
@@ -5834,7 +5967,1117 @@
         "modelAsString": false
       }
     },
+    "OpenAI.InputMessageContentList": {
+      "type": "array",
+      "description": "A list of one or many input items to the model, containing different content\ntypes.",
+      "items": {
+        "$ref": "#/definitions/OpenAI.InputContent"
+      }
+    },
+    "OpenAI.InputMessageResource": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "string",
+          "description": "The role of the message input. One of `user`, `system`, or `developer`.",
+          "enum": [
+            "user",
+            "system",
+            "developer"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of item. One of `in_progress`, `completed`, or\n  `incomplete`. Populated when items are returned via API.",
+          "enum": [
+            "in_progress",
+            "completed",
+            "incomplete"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        },
+        "content": {
+          "$ref": "#/definitions/OpenAI.InputMessageContentList"
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the message input."
+        }
+      },
+      "required": [
+        "role",
+        "content",
+        "id"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "message"
+    },
     "OpenAI.InputParam": {},
+    "OpenAI.ItemResource": {
+      "type": "object",
+      "description": "Content item used to generate a response.",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/OpenAI.ItemResourceType"
+        },
+        "agent_reference": {
+          "$ref": "#/definitions/FoundryAgentReference",
+          "description": "The agent that created the item."
+        },
+        "response_id": {
+          "type": "string",
+          "description": "The response on which the item is created."
+        }
+      },
+      "discriminator": "type",
+      "required": [
+        "type"
+      ]
+    },
+    "OpenAI.ItemResourceApplyPatchToolCall": {
+      "type": "object",
+      "title": "Apply patch tool call",
+      "description": "A tool call that applies file diffs by creating, deleting, or updating files.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the apply patch tool call. Populated when this item is returned via API."
+        },
+        "call_id": {
+          "type": "string",
+          "description": "The unique ID of the apply patch tool call generated by the model."
+        },
+        "status": {
+          "$ref": "#/definitions/OpenAI.ApplyPatchCallStatus",
+          "description": "The status of the apply patch tool call. One of `in_progress` or `completed`."
+        },
+        "operation": {
+          "$ref": "#/definitions/OpenAI.ApplyPatchFileOperation",
+          "title": "Apply patch operation",
+          "description": "One of the create_file, delete_file, or update_file operations applied via apply_patch."
+        },
+        "created_by": {
+          "type": "string",
+          "description": "The ID of the entity that created this tool call."
+        }
+      },
+      "required": [
+        "id",
+        "call_id",
+        "status",
+        "operation"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "apply_patch_call"
+    },
+    "OpenAI.ItemResourceApplyPatchToolCallOutput": {
+      "type": "object",
+      "title": "Apply patch tool call output",
+      "description": "The output emitted by an apply patch tool call.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the apply patch tool call output. Populated when this item is returned via API."
+        },
+        "call_id": {
+          "type": "string",
+          "description": "The unique ID of the apply patch tool call generated by the model."
+        },
+        "status": {
+          "$ref": "#/definitions/OpenAI.ApplyPatchCallOutputStatus",
+          "description": "The status of the apply patch tool call output. One of `completed` or `failed`."
+        },
+        "output": {
+          "type": "string",
+          "x-nullable": true
+        },
+        "created_by": {
+          "type": "string",
+          "description": "The ID of the entity that created this tool call output."
+        }
+      },
+      "required": [
+        "id",
+        "call_id",
+        "status"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "apply_patch_call_output"
+    },
+    "OpenAI.ItemResourceCodeInterpreterToolCall": {
+      "type": "object",
+      "title": "Code interpreter tool call",
+      "description": "A tool call to run code.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the code interpreter tool call."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the code interpreter tool call. Valid values are `in_progress`, `completed`, `incomplete`, `interpreting`, and `failed`.",
+          "enum": [
+            "in_progress",
+            "completed",
+            "incomplete",
+            "interpreting",
+            "failed"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        },
+        "container_id": {
+          "type": "string",
+          "description": "The ID of the container used to run the code."
+        },
+        "code": {
+          "type": "string",
+          "x-nullable": true
+        },
+        "outputs": {
+          "type": "array",
+          "x-nullable": true,
+          "items": {}
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "container_id",
+        "code",
+        "outputs"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "code_interpreter_call"
+    },
+    "OpenAI.ItemResourceComputerToolCall": {
+      "type": "object",
+      "title": "Computer tool call",
+      "description": "A tool call to a computer use tool. See the\n[computer use guide](/docs/guides/tools-computer-use) for more information.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the computer call."
+        },
+        "call_id": {
+          "type": "string",
+          "description": "An identifier used when responding to the tool call with output."
+        },
+        "action": {
+          "$ref": "#/definitions/OpenAI.ComputerAction"
+        },
+        "pending_safety_checks": {
+          "type": "array",
+          "description": "The pending safety checks for the computer call.",
+          "items": {
+            "$ref": "#/definitions/OpenAI.ComputerCallSafetyCheckParam"
+          }
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the item. One of `in_progress`, `completed`, or\n  `incomplete`. Populated when items are returned via API.",
+          "enum": [
+            "in_progress",
+            "completed",
+            "incomplete"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "call_id",
+        "action",
+        "pending_safety_checks",
+        "status"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "computer_call"
+    },
+    "OpenAI.ItemResourceComputerToolCallOutputResource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The ID of the computer tool call output."
+        },
+        "call_id": {
+          "type": "string",
+          "description": "The ID of the computer tool call that produced the output."
+        },
+        "acknowledged_safety_checks": {
+          "type": "array",
+          "description": "The safety checks reported by the API that have been acknowledged by the\n  developer.",
+          "items": {
+            "$ref": "#/definitions/OpenAI.ComputerCallSafetyCheckParam"
+          }
+        },
+        "output": {
+          "$ref": "#/definitions/OpenAI.ComputerScreenshotImage"
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the message input. One of `in_progress`, `completed`, or\n  `incomplete`. Populated when input items are returned via API.",
+          "enum": [
+            "in_progress",
+            "completed",
+            "incomplete"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        }
+      },
+      "required": [
+        "call_id",
+        "output"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "computer_call_output"
+    },
+    "OpenAI.ItemResourceFileSearchToolCall": {
+      "type": "object",
+      "title": "File search tool call",
+      "description": "The results of a file search tool call. See the\n[file search guide](/docs/guides/tools-file-search) for more information.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the file search tool call."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the file search tool call. One of `in_progress`,\n  `searching`, `incomplete` or `failed`,",
+          "enum": [
+            "in_progress",
+            "searching",
+            "completed",
+            "incomplete",
+            "failed"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        },
+        "queries": {
+          "type": "array",
+          "description": "The queries used to search for files.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "results": {
+          "type": "array",
+          "x-nullable": true,
+          "items": {
+            "$ref": "#/definitions/OpenAI.FileSearchToolCallResults"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "queries"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "file_search_call"
+    },
+    "OpenAI.ItemResourceFunctionShellCall": {
+      "type": "object",
+      "title": "Shell tool call",
+      "description": "A tool call that executes one or more shell commands in a managed environment.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the shell tool call. Populated when this item is returned via API."
+        },
+        "call_id": {
+          "type": "string",
+          "description": "The unique ID of the shell tool call generated by the model."
+        },
+        "action": {
+          "$ref": "#/definitions/OpenAI.FunctionShellAction",
+          "description": "The shell commands and limits that describe how to run the tool call."
+        },
+        "status": {
+          "$ref": "#/definitions/OpenAI.LocalShellCallStatus",
+          "description": "The status of the shell call. One of `in_progress`, `completed`, or `incomplete`."
+        },
+        "environment": {
+          "$ref": "#/definitions/OpenAI.FunctionShellCallEnvironment",
+          "x-nullable": true
+        },
+        "created_by": {
+          "type": "string",
+          "description": "The ID of the entity that created this tool call."
+        }
+      },
+      "required": [
+        "id",
+        "call_id",
+        "action",
+        "status",
+        "environment"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "shell_call"
+    },
+    "OpenAI.ItemResourceFunctionShellCallOutput": {
+      "type": "object",
+      "title": "Shell call output",
+      "description": "The output of a shell tool call that was emitted.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the shell call output. Populated when this item is returned via API."
+        },
+        "call_id": {
+          "type": "string",
+          "description": "The unique ID of the shell tool call generated by the model."
+        },
+        "status": {
+          "$ref": "#/definitions/OpenAI.LocalShellCallOutputStatusEnum",
+          "description": "The status of the shell call output. One of `in_progress`, `completed`, or `incomplete`."
+        },
+        "output": {
+          "type": "array",
+          "description": "An array of shell call output contents",
+          "items": {
+            "$ref": "#/definitions/OpenAI.FunctionShellCallOutputContent"
+          }
+        },
+        "max_output_length": {
+          "type": "integer",
+          "format": "int64",
+          "x-nullable": true
+        },
+        "created_by": {
+          "type": "string",
+          "description": "The identifier of the actor that created the item."
+        }
+      },
+      "required": [
+        "id",
+        "call_id",
+        "status",
+        "output",
+        "max_output_length"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "shell_call_output"
+    },
+    "OpenAI.ItemResourceFunctionToolCallOutputResource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the function tool call output. Populated when this item\n  is returned via API."
+        },
+        "call_id": {
+          "type": "string",
+          "description": "The unique ID of the function tool call generated by the model."
+        },
+        "output": {
+          "description": "The output from the function call generated by your code.\n  Can be a string or an list of output content."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the item. One of `in_progress`, `completed`, or\n  `incomplete`. Populated when items are returned via API.",
+          "enum": [
+            "in_progress",
+            "completed",
+            "incomplete"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        }
+      },
+      "required": [
+        "call_id",
+        "output"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "function_call_output"
+    },
+    "OpenAI.ItemResourceFunctionToolCallResource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the function tool call."
+        },
+        "call_id": {
+          "type": "string",
+          "description": "The unique ID of the function tool call generated by the model."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the function to run."
+        },
+        "arguments": {
+          "type": "string",
+          "description": "A JSON string of the arguments to pass to the function."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the item. One of `in_progress`, `completed`, or\n  `incomplete`. Populated when items are returned via API.",
+          "enum": [
+            "in_progress",
+            "completed",
+            "incomplete"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        }
+      },
+      "required": [
+        "call_id",
+        "name",
+        "arguments"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "function_call"
+    },
+    "OpenAI.ItemResourceImageGenToolCall": {
+      "type": "object",
+      "title": "Image generation call",
+      "description": "An image generation request made by the model.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the image generation call."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the image generation call.",
+          "enum": [
+            "in_progress",
+            "completed",
+            "generating",
+            "failed"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        },
+        "result": {
+          "type": "string",
+          "x-nullable": true
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "result"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "image_generation_call"
+    },
+    "OpenAI.ItemResourceLocalShellToolCall": {
+      "type": "object",
+      "title": "Local shell call",
+      "description": "A tool call to run a command on the local shell.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the local shell call."
+        },
+        "call_id": {
+          "type": "string",
+          "description": "The unique ID of the local shell tool call generated by the model."
+        },
+        "action": {
+          "$ref": "#/definitions/OpenAI.LocalShellExecAction"
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the local shell call.",
+          "enum": [
+            "in_progress",
+            "completed",
+            "incomplete"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "call_id",
+        "action",
+        "status"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "local_shell_call"
+    },
+    "OpenAI.ItemResourceLocalShellToolCallOutput": {
+      "type": "object",
+      "title": "Local shell call output",
+      "description": "The output of a local shell tool call.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the local shell tool call generated by the model."
+        },
+        "output": {
+          "type": "string",
+          "description": "A JSON string of the output of the local shell tool call."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "in_progress",
+            "completed",
+            "incomplete"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          },
+          "x-nullable": true
+        }
+      },
+      "required": [
+        "id",
+        "output"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "local_shell_call_output"
+    },
+    "OpenAI.ItemResourceMcpApprovalRequest": {
+      "type": "object",
+      "title": "MCP approval request",
+      "description": "A request for human approval of a tool invocation.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the approval request."
+        },
+        "server_label": {
+          "type": "string",
+          "description": "The label of the MCP server making the request."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the tool to run."
+        },
+        "arguments": {
+          "type": "string",
+          "description": "A JSON string of arguments for the tool."
+        }
+      },
+      "required": [
+        "id",
+        "server_label",
+        "name",
+        "arguments"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "mcp_approval_request"
+    },
+    "OpenAI.ItemResourceMcpApprovalResponseResource": {
+      "type": "object",
+      "title": "MCP approval response",
+      "description": "A response to an MCP approval request.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the approval response"
+        },
+        "approval_request_id": {
+          "type": "string",
+          "description": "The ID of the approval request being answered."
+        },
+        "approve": {
+          "type": "boolean",
+          "description": "Whether the request was approved."
+        },
+        "reason": {
+          "type": "string",
+          "x-nullable": true
+        }
+      },
+      "required": [
+        "id",
+        "approval_request_id",
+        "approve"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "mcp_approval_response"
+    },
+    "OpenAI.ItemResourceMcpListTools": {
+      "type": "object",
+      "title": "MCP list tools",
+      "description": "A list of tools available on an MCP server.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the list."
+        },
+        "server_label": {
+          "type": "string",
+          "description": "The label of the MCP server."
+        },
+        "tools": {
+          "type": "array",
+          "description": "The tools available on the server.",
+          "items": {
+            "$ref": "#/definitions/OpenAI.MCPListToolsTool"
+          }
+        },
+        "error": {
+          "type": "string",
+          "x-nullable": true
+        }
+      },
+      "required": [
+        "id",
+        "server_label",
+        "tools"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "mcp_list_tools"
+    },
+    "OpenAI.ItemResourceMcpToolCall": {
+      "type": "object",
+      "title": "MCP tool call",
+      "description": "An invocation of a tool on an MCP server.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the tool call."
+        },
+        "server_label": {
+          "type": "string",
+          "description": "The label of the MCP server running the tool."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the tool that was run."
+        },
+        "arguments": {
+          "type": "string",
+          "description": "A JSON string of the arguments passed to the tool."
+        },
+        "output": {
+          "type": "string",
+          "x-nullable": true
+        },
+        "error": {
+          "type": "string",
+          "x-nullable": true
+        },
+        "status": {
+          "$ref": "#/definitions/OpenAI.MCPToolCallStatus",
+          "description": "The status of the tool call. One of `in_progress`, `completed`, `incomplete`, `calling`, or `failed`."
+        },
+        "approval_request_id": {
+          "type": "string",
+          "x-nullable": true
+        }
+      },
+      "required": [
+        "id",
+        "server_label",
+        "name",
+        "arguments"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "mcp_call"
+    },
+    "OpenAI.ItemResourceOutputMessage": {
+      "type": "object",
+      "title": "Output message",
+      "description": "An output message from the model.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the output message."
+        },
+        "role": {
+          "type": "string",
+          "description": "The role of the output message. Always `assistant`.",
+          "enum": [
+            "assistant"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          },
+          "x-stainless-const": true
+        },
+        "content": {
+          "type": "array",
+          "description": "The content of the output message.",
+          "items": {
+            "$ref": "#/definitions/OpenAI.OutputMessageContent"
+          }
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the message input. One of `in_progress`, `completed`, or\n  `incomplete`. Populated when input items are returned via API.",
+          "enum": [
+            "in_progress",
+            "completed",
+            "incomplete"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "role",
+        "content",
+        "status"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "output_message"
+    },
+    "OpenAI.ItemResourceType": {
+      "type": "string",
+      "enum": [
+        "message",
+        "output_message",
+        "file_search_call",
+        "computer_call",
+        "computer_call_output",
+        "web_search_call",
+        "function_call",
+        "function_call_output",
+        "image_generation_call",
+        "code_interpreter_call",
+        "local_shell_call",
+        "local_shell_call_output",
+        "shell_call",
+        "shell_call_output",
+        "apply_patch_call",
+        "apply_patch_call_output",
+        "mcp_list_tools",
+        "mcp_approval_request",
+        "mcp_approval_response",
+        "mcp_call",
+        "structured_outputs",
+        "oauth_consent_request",
+        "memory_search_call",
+        "workflow_action",
+        "a2a_preview_call",
+        "a2a_preview_call_output",
+        "bing_grounding_call",
+        "bing_grounding_call_output",
+        "sharepoint_grounding_preview_call",
+        "sharepoint_grounding_preview_call_output",
+        "azure_ai_search_call",
+        "azure_ai_search_call_output",
+        "bing_custom_search_preview_call",
+        "bing_custom_search_preview_call_output",
+        "openapi_call",
+        "openapi_call_output",
+        "browser_automation_preview_call",
+        "browser_automation_preview_call_output",
+        "fabric_dataagent_preview_call",
+        "fabric_dataagent_preview_call_output",
+        "azure_function_call",
+        "azure_function_call_output"
+      ],
+      "x-ms-enum": {
+        "name": "ItemResourceType",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "message",
+            "value": "message"
+          },
+          {
+            "name": "output_message",
+            "value": "output_message"
+          },
+          {
+            "name": "file_search_call",
+            "value": "file_search_call"
+          },
+          {
+            "name": "computer_call",
+            "value": "computer_call"
+          },
+          {
+            "name": "computer_call_output",
+            "value": "computer_call_output"
+          },
+          {
+            "name": "web_search_call",
+            "value": "web_search_call"
+          },
+          {
+            "name": "function_call",
+            "value": "function_call"
+          },
+          {
+            "name": "function_call_output",
+            "value": "function_call_output"
+          },
+          {
+            "name": "image_generation_call",
+            "value": "image_generation_call"
+          },
+          {
+            "name": "code_interpreter_call",
+            "value": "code_interpreter_call"
+          },
+          {
+            "name": "local_shell_call",
+            "value": "local_shell_call"
+          },
+          {
+            "name": "local_shell_call_output",
+            "value": "local_shell_call_output"
+          },
+          {
+            "name": "shell_call",
+            "value": "shell_call"
+          },
+          {
+            "name": "shell_call_output",
+            "value": "shell_call_output"
+          },
+          {
+            "name": "apply_patch_call",
+            "value": "apply_patch_call"
+          },
+          {
+            "name": "apply_patch_call_output",
+            "value": "apply_patch_call_output"
+          },
+          {
+            "name": "mcp_list_tools",
+            "value": "mcp_list_tools"
+          },
+          {
+            "name": "mcp_approval_request",
+            "value": "mcp_approval_request"
+          },
+          {
+            "name": "mcp_approval_response",
+            "value": "mcp_approval_response"
+          },
+          {
+            "name": "mcp_call",
+            "value": "mcp_call"
+          },
+          {
+            "name": "structured_outputs",
+            "value": "structured_outputs"
+          },
+          {
+            "name": "oauth_consent_request",
+            "value": "oauth_consent_request"
+          },
+          {
+            "name": "memory_search_call",
+            "value": "memory_search_call"
+          },
+          {
+            "name": "workflow_action",
+            "value": "workflow_action"
+          },
+          {
+            "name": "a2a_preview_call",
+            "value": "a2a_preview_call"
+          },
+          {
+            "name": "a2a_preview_call_output",
+            "value": "a2a_preview_call_output"
+          },
+          {
+            "name": "bing_grounding_call",
+            "value": "bing_grounding_call"
+          },
+          {
+            "name": "bing_grounding_call_output",
+            "value": "bing_grounding_call_output"
+          },
+          {
+            "name": "sharepoint_grounding_preview_call",
+            "value": "sharepoint_grounding_preview_call"
+          },
+          {
+            "name": "sharepoint_grounding_preview_call_output",
+            "value": "sharepoint_grounding_preview_call_output"
+          },
+          {
+            "name": "azure_ai_search_call",
+            "value": "azure_ai_search_call"
+          },
+          {
+            "name": "azure_ai_search_call_output",
+            "value": "azure_ai_search_call_output"
+          },
+          {
+            "name": "bing_custom_search_preview_call",
+            "value": "bing_custom_search_preview_call"
+          },
+          {
+            "name": "bing_custom_search_preview_call_output",
+            "value": "bing_custom_search_preview_call_output"
+          },
+          {
+            "name": "openapi_call",
+            "value": "openapi_call"
+          },
+          {
+            "name": "openapi_call_output",
+            "value": "openapi_call_output"
+          },
+          {
+            "name": "browser_automation_preview_call",
+            "value": "browser_automation_preview_call"
+          },
+          {
+            "name": "browser_automation_preview_call_output",
+            "value": "browser_automation_preview_call_output"
+          },
+          {
+            "name": "fabric_dataagent_preview_call",
+            "value": "fabric_dataagent_preview_call"
+          },
+          {
+            "name": "fabric_dataagent_preview_call_output",
+            "value": "fabric_dataagent_preview_call_output"
+          },
+          {
+            "name": "azure_function_call",
+            "value": "azure_function_call"
+          },
+          {
+            "name": "azure_function_call_output",
+            "value": "azure_function_call_output"
+          }
+        ]
+      }
+    },
+    "OpenAI.ItemResourceWebSearchToolCall": {
+      "type": "object",
+      "title": "Web search tool call",
+      "description": "The results of a web search tool call. See the\n[web search guide](/docs/guides/tools-web-search) for more information.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the web search tool call."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the web search tool call.",
+          "enum": [
+            "in_progress",
+            "searching",
+            "completed",
+            "failed"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        },
+        "action": {
+          "description": "An object describing the specific action taken in this web search call.\n  Includes details on how the model used the web (search, open_page, find_in_page)."
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "action"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/OpenAI.ItemResource"
+        }
+      ],
+      "x-ms-discriminator-value": "web_search_call"
+    },
     "OpenAI.KeyPressAction": {
       "type": "object",
       "title": "KeyPress",
@@ -8999,7 +10242,7 @@
           "type": "array",
           "description": "The list of input items.",
           "items": {
-            "$ref": "#/definitions/OpenAI.OutputItem"
+            "$ref": "#/definitions/OpenAI.ItemResource"
           }
         },
         "first_id": {
