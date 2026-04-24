@@ -547,6 +547,30 @@ model DiscoveryProperties {
   }
 );
 
+@doc("Paged list of response input items with Discovery extensions.")
+@added(Versions.`2026-06-01`)
+model ResponseItemList {
+  @doc("The object type, which is always 'list'.")
+  object: "list";
+
+  @doc("The list of input items.")
+  @pageItems
+  data: OpenAI.OutputItem[];
+
+  @doc("The first ID represented in this list.")
+  first_id?: string;
+
+  @doc("The last ID represented in this list.")
+  @continuationToken
+  last_id?: string;
+
+  @doc("A value indicating whether there are additional values available not captured in this list.")
+  has_more: boolean;
+
+  @doc("Discovery-specific extensions.")
+  discoveryProperties?: DiscoveryProperties;
+}
+
 // ============================================================================
 // v1 Response API Interface
 // ============================================================================
@@ -573,9 +597,9 @@ interface ConversationResponses {
   >;
 
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Need paged result with Foundry v1 OutputItem"
-  @doc("Returns input items for a Response.")
+  @doc("Get input items for a Response. Returns the OpenAI ResponseItemList with Discovery extensions containing storage assets.")
   @get
-  @route("/conversations/{conversationName}/openai/v1/responses/{responseId}/input_items")
+  @route("/conversations/{conversationName}/openai/v1/responses/{responseId}/inputs")
   listInputItems(
     ...Azure.Core.Foundations.ApiVersionParameter,
     ...ConversationPathContent,
@@ -585,7 +609,7 @@ interface ConversationResponses {
     responseId: string,
 
     ...FoundryPageQueryParams,
-  ): FoundryPagedResult<OpenAI.OutputItem>;
+  ): ResponseItemList;
 
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Need paged result of OpenAI.Response"
   #suppress "@azure-tools/typespec-azure-core/use-standard-names" "List operation returns FoundryPagedResult"
@@ -612,14 +636,6 @@ interface ConversationResponses {
       responseId: string;
     },
     OpenAI.Response
-  >;
-
-  @doc("Deletes a Response.")
-  @delete
-  deleteResponse is Azure.Core.Foundations.ResourceOperation<
-    ConversationResponseResource,
-    {},
-    DeleteResponseResult
   >;
 
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Need OpenAI.Response return type"

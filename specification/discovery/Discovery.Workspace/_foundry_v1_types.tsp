@@ -139,27 +139,6 @@ union FoundryItemType {
 }
 
 // ============================================================================
-// Foundry v1 Delete Response Result
-// ============================================================================
-
-@added(Versions.`2026-06-01`)
-union ResponseObjectType {
-  response: "response",
-}
-
-@doc("The result of a delete response operation.")
-@added(Versions.`2026-06-01`)
-model DeleteResponseResult {
-  @doc("The operation ID.")
-  id: string;
-
-  @doc("Always return 'response'.")
-  object: ResponseObjectType.response;
-
-  @doc("Always return true.")
-  deleted: true;
-}
-
 // ============================================================================
 // Foundry v1 Compact Response
 // ============================================================================

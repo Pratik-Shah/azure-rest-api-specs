@@ -781,50 +781,6 @@
             }
           }
         }
-      },
-      "delete": {
-        "operationId": "ConversationResponses_DeleteResponse",
-        "description": "Deletes a Response.",
-        "parameters": [
-          {
-            "$ref": "#/parameters/Azure.Core.Foundations.ApiVersionParameter"
-          },
-          {
-            "name": "conversationName",
-            "in": "path",
-            "description": "The conversation name.",
-            "required": true,
-            "type": "string",
-            "pattern": "^[a-zA-Z0-9-]{1,75}$"
-          },
-          {
-            "name": "responseId",
-            "in": "path",
-            "description": "The response ID.",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded.",
-            "schema": {
-              "$ref": "#/definitions/DeleteResponseResult"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
-            },
-            "headers": {
-              "x-ms-error-code": {
-                "type": "string",
-                "description": "String error code indicating what went wrong."
-              }
-            }
-          }
-        }
       }
     },
     "/conversations/{conversationName}/openai/v1/responses/{responseId}:submitUserInput": {
@@ -1154,10 +1110,10 @@
         }
       }
     },
-    "/conversations/{conversationName}/openai/v1/responses/{responseId}/input_items": {
+    "/conversations/{conversationName}/openai/v1/responses/{responseId}/inputs": {
       "get": {
         "operationId": "ConversationResponses_ListInputItems",
-        "description": "Returns input items for a Response.",
+        "description": "Get input items for a Response. Returns the OpenAI ResponseItemList with Discovery extensions containing storage assets.",
         "parameters": [
           {
             "$ref": "#/parameters/Azure.Core.Foundations.ApiVersionParameter"
@@ -1193,33 +1149,7 @@
           "200": {
             "description": "The request has succeeded.",
             "schema": {
-              "type": "object",
-              "description": "The response data for a requested list of items.",
-              "properties": {
-                "data": {
-                  "type": "array",
-                  "description": "The requested list of items.",
-                  "items": {
-                    "$ref": "#/definitions/OpenAI.OutputItem"
-                  }
-                },
-                "first_id": {
-                  "type": "string",
-                  "description": "The first ID represented in this list."
-                },
-                "last_id": {
-                  "type": "string",
-                  "description": "The last ID represented in this list."
-                },
-                "has_more": {
-                  "type": "boolean",
-                  "description": "A value indicating whether there are additional values available not captured in this list."
-                }
-              },
-              "required": [
-                "data",
-                "has_more"
-              ]
+              "$ref": "#/definitions/ResponseItemList"
             }
           }
         }
@@ -3317,38 +3247,6 @@
       },
       "required": [
         "projectName"
-      ]
-    },
-    "DeleteResponseResult": {
-      "type": "object",
-      "description": "The result of a delete response operation.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "The operation ID."
-        },
-        "object": {
-          "type": "string",
-          "description": "Always return 'response'.",
-          "enum": [
-            "response"
-          ],
-          "x-ms-enum": {
-            "modelAsString": false
-          }
-        },
-        "deleted": {
-          "type": "boolean",
-          "description": "Always return true.",
-          "enum": [
-            true
-          ]
-        }
-      },
-      "required": [
-        "id",
-        "object",
-        "deleted"
       ]
     },
     "DiscoveryAgent": {
@@ -9081,6 +8979,50 @@
       },
       "required": [
         "value"
+      ]
+    },
+    "ResponseItemList": {
+      "type": "object",
+      "description": "Paged list of response input items with Discovery extensions.",
+      "properties": {
+        "object": {
+          "type": "string",
+          "description": "The object type, which is always 'list'.",
+          "enum": [
+            "list"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        },
+        "data": {
+          "type": "array",
+          "description": "The list of input items.",
+          "items": {
+            "$ref": "#/definitions/OpenAI.OutputItem"
+          }
+        },
+        "first_id": {
+          "type": "string",
+          "description": "The first ID represented in this list."
+        },
+        "last_id": {
+          "type": "string",
+          "description": "The last ID represented in this list."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "A value indicating whether there are additional values available not captured in this list."
+        },
+        "discoveryProperties": {
+          "$ref": "#/definitions/DiscoveryProperties",
+          "description": "Discovery-specific extensions."
+        }
+      },
+      "required": [
+        "object",
+        "data",
+        "has_more"
       ]
     },
     "RunRequest": {
