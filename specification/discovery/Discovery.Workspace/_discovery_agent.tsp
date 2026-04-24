@@ -252,6 +252,19 @@ model DiscoveryKnowledgeBaseReference {
 }
 
 // ============================================================================
+// Feature opt-in header (mirrors Foundry's Foundry-Features pattern)
+// ============================================================================
+
+@doc("Feature opt-in keys for agent definition operations supporting hosted agents.")
+@added(Versions.`2026-06-01`)
+union DiscoveryAgentDefinitionOptInKeys {
+  string,
+
+  @doc("Opt-in for hosted agents preview features.")
+  hosted_agents_v1_preview: "HostedAgents=V1Preview",
+}
+
+// ============================================================================
 // v1 Agents Interface
 // ============================================================================
 
@@ -267,7 +280,7 @@ interface DiscoveryAgents {
   @pollingOperation(DiscoveryAgents.getOperationStatus)
   upsertAgent is Operations.LongRunningResourceAction<
     Project,
-    DiscoveryAgentCreateOrUpdate,
+    DiscoveryAgentCreateOrUpdate & FoundryFeaturesHeader,
     DiscoveryAgent
   >;
 
@@ -277,4 +290,12 @@ interface DiscoveryAgents {
 
   @doc("List discovery agents in a project.")
   listAgents is ResourceList<DiscoveryAgent>;
+}
+
+@doc("Optional Foundry-Features header for preview feature opt-in.")
+@added(Versions.`2026-06-01`)
+model FoundryFeaturesHeader {
+  @doc("A feature flag opt-in required when using preview agent definitions such as hosted agents.")
+  @header("Foundry-Features")
+  foundryFeatures?: DiscoveryAgentDefinitionOptInKeys;
 }

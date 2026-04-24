@@ -783,6 +783,51 @@
         }
       }
     },
+    "/conversations/{conversationName}/openai/v1/responses/{responseId}:cancel": {
+      "post": {
+        "operationId": "ConversationResponses_CancelResponse",
+        "description": "Cancels an in-progress Response.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/Azure.Core.Foundations.ApiVersionParameter"
+          },
+          {
+            "name": "conversationName",
+            "in": "path",
+            "description": "The conversation name.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "responseId",
+            "in": "path",
+            "description": "The response ID.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/OpenAI.Response"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
+            },
+            "headers": {
+              "x-ms-error-code": {
+                "type": "string",
+                "description": "String error code indicating what went wrong."
+              }
+            }
+          }
+        }
+      }
+    },
     "/conversations/{conversationName}/openai/v1/responses/{responseId}:submitUserInput": {
       "post": {
         "operationId": "ConversationResponses_SubmitUserInput",
@@ -1065,51 +1110,6 @@
         }
       }
     },
-    "/conversations/{conversationName}/openai/v1/responses/{responseId}/cancel": {
-      "post": {
-        "operationId": "ConversationResponses_CancelResponse",
-        "description": "Cancels an in-progress Response.",
-        "parameters": [
-          {
-            "$ref": "#/parameters/Azure.Core.Foundations.ApiVersionParameter"
-          },
-          {
-            "name": "conversationName",
-            "in": "path",
-            "description": "The conversation name.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "responseId",
-            "in": "path",
-            "description": "The response ID.",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded.",
-            "schema": {
-              "$ref": "#/definitions/OpenAI.Response"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
-            },
-            "headers": {
-              "x-ms-error-code": {
-                "type": "string",
-                "description": "String error code indicating what went wrong."
-              }
-            }
-          }
-        }
-      }
-    },
     "/conversations/{conversationName}/openai/v1/responses/{responseId}/inputs": {
       "get": {
         "operationId": "ConversationResponses_ListInputItems",
@@ -1171,6 +1171,9 @@
             "type": "string",
             "maxLength": 24,
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "$ref": "#/parameters/FoundryFeaturesHeader"
           },
           {
             "$ref": "#/parameters/Azure.Core.RepeatabilityRequestHeaders.repeatabilityRequestId"
@@ -3542,6 +3545,10 @@
         "knowledgeBaseId": {
           "type": "string",
           "description": "The resource ID of the knowledge base."
+        },
+        "name": {
+          "type": "string",
+          "description": "The display name of the knowledge base."
         }
       },
       "required": [
@@ -3626,6 +3633,10 @@
               }
             ]
           }
+        },
+        "name": {
+          "type": "string",
+          "description": "The display name of the tool."
         },
         "confirmation": {
           "$ref": "#/definitions/DiscoveryConfirmationState",
@@ -11135,6 +11146,29 @@
       "type": "string",
       "x-ms-parameter-location": "method",
       "x-ms-client-name": "repeatabilityRequestId"
+    },
+    "FoundryFeaturesHeader": {
+      "name": "Foundry-Features",
+      "in": "header",
+      "description": "A feature flag opt-in required when using preview agent definitions such as hosted agents.",
+      "required": false,
+      "type": "string",
+      "enum": [
+        "HostedAgents=V1Preview"
+      ],
+      "x-ms-enum": {
+        "name": "DiscoveryAgentDefinitionOptInKeys",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "hosted_agents_v1_preview",
+            "value": "HostedAgents=V1Preview",
+            "description": "Opt-in for hosted agents preview features."
+          }
+        ]
+      },
+      "x-ms-parameter-location": "method",
+      "x-ms-client-name": "foundryFeatures"
     },
     "FoundryPageQueryParams.after": {
       "name": "after",
