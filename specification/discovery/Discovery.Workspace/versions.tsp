@@ -1,4 +1,5 @@
 import "@typespec/versioning";
+import "./.external-foundry/Azure.AI.Projects/_service.tsp";
 
 using TypeSpec.Versioning;
 
@@ -11,5 +12,6 @@ enum Versions {
   `2026-02-01-preview`,
 
   @doc("The 2026-06-01 stable version of the Microsoft.Discovery service data plane.")
+  @useDependency(Azure.AI.Projects.Versions.v1)
   `2026-06-01`,
 }

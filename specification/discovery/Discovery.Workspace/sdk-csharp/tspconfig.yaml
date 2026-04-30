@@ -1,0 +1,17 @@
+# SDK-specific tspconfig for C# generation (matches preview pipeline).
+# Uses views/client-emitters to get ResponseStreamEvent base model and
+# full discriminated streaming event hierarchy.
+# The main tspconfig.yaml (parent folder) remains unchanged for swagger generation.
+emit:
+  - "@azure-typespec/http-client-csharp"
+options:
+  "@azure-typespec/http-client-csharp":
+    emitter-output-dir: "{output-dir}"
+    namespace: Azure.Discovery.Workspace
+    package-name: Azure.Discovery.Workspace
+    model-namespace: false
+imports:
+  - "@azure-tools/typespec-azure-core"
+  - "@azure-tools/typespec-azure-core/experimental"
+  - "@azure-tools/typespec-client-generator-core"
+  - "@azure-tools/openai-typespec/views/client-emitters/models/responses"

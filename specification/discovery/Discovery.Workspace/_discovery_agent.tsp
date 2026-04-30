@@ -185,7 +185,7 @@ model DiscoveryAgentCreateOrUpdate {
 
   @doc("Foundry agent creation request (pass-through to Foundry v1).")
   @visibility(Lifecycle.Create)
-  foundryDetails: FoundryCreateAgentVersionRequest;
+  foundryDetails: Azure.AI.Projects.CreateAgentVersionRequest;
 }
 
 @doc("A Microsoft Discovery AI agent (v1).")
@@ -209,7 +209,7 @@ model DiscoveryAgent {
 
   @doc("Foundry agent object (returned from Foundry v1).")
   @visibility(Lifecycle.Read)
-  foundryDetails?: FoundryAgentObject;
+  foundryDetails?: Azure.AI.Projects.AgentObject;
 
   @doc("URI to the agent in Foundry Agent Studio.")
   @visibility(Lifecycle.Read)

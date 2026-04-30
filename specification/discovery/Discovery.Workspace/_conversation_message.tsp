@@ -580,6 +580,7 @@ interface ConversationResponses {
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Need custom body type and OpenAI.Response return"
   @doc("Creates a Response. Returns the Foundry v1 Response with Discovery extensions.")
   @post
+  @sharedRoute
   @createsResource(ConversationResponseResource)
   createResponse is Foundations.ResourceCollectionOperation<
     ConversationResponseResource,
@@ -587,13 +588,45 @@ interface ConversationResponses {
     TypeSpec.Http.Response<201> & TypeSpec.Http.LocationHeader & OpenAI.Response
   >;
 
+  // NOTE: Streaming endpoints included for model generation. Remove @sharedRoute for swagger.
+  #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Need SSE streaming response"
+  @doc("Creates a Response with streaming. Returns server-sent events of the Foundry v1 streaming response.")
+  @post
+  @sharedRoute
+  @createsResource(ConversationResponseResource)
+  createResponseStream is Foundations.ResourceCollectionOperation<
+    ConversationResponseResource,
+    OpenAI.CreateResponse,
+    {
+      @TypeSpec.Http.header("Content-Type") contentType: "text/event-stream";
+      @body body: OpenAI.CreateResponseStreamingResponse;
+    }
+  >;
+
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Need OpenAI.Response return type"
   @doc("Retrieves a Response by ID. Returns the Foundry v1 Response with Discovery extensions.")
   @get
+  @sharedRoute
   getResponse is Foundations.ResourceOperation<
     ConversationResponseResource,
     {},
     OpenAI.Response
+  >;
+
+  #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Need SSE streaming response"
+  @doc("Retrieves a Response by ID with streaming. Returns server-sent events of the Foundry v1 streaming response.")
+  @get
+  @sharedRoute
+  getResponseStream is Foundations.ResourceOperation<
+    ConversationResponseResource,
+    {
+      @TypeSpec.Http.header("Accept") accept: "text/event-stream";
+      @query starting_after?: int32;
+    },
+    {
+      @TypeSpec.Http.header("Content-Type") contentType: "text/event-stream";
+      @body body: OpenAI.CreateResponseStreamingResponse;
+    }
   >;
 
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Need paged result with Foundry v1 ItemResource"
@@ -608,20 +641,20 @@ interface ConversationResponses {
     @path
     responseId: string,
 
-    ...FoundryPageQueryParams,
+    ...Azure.AI.Projects.CommonPageQueryParameters,
   ): ResponseItemList;
 
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Need paged result of OpenAI.Response"
-  #suppress "@azure-tools/typespec-azure-core/use-standard-names" "List operation returns FoundryPagedResult"
+  #suppress "@azure-tools/typespec-azure-core/use-standard-names" "List operation returns AgentsPagedResult"
   @doc("Lists all Responses in a conversation.")
   @get
   @route("/conversations/{conversationName}/openai/v1/responses")
   listResponses(
     ...Azure.Core.Foundations.ApiVersionParameter,
     ...ConversationPathContent,
-    ...FoundryPageQueryParams,
+    ...Azure.AI.Projects.CommonPageQueryParameters,
     ...WithQueryCreatedSince,
-  ): FoundryPagedResult<OpenAI.Response>;
+  ): Azure.AI.Projects.AgentsPagedResult<OpenAI.Response>;
 
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Need custom route and OpenAI.Response return type"
   @doc("Cancels an in-progress Response.")

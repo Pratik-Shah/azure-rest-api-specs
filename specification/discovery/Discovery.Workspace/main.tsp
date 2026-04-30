@@ -12,7 +12,12 @@ import "./_conversation_message_logs.tsp";
 import "./_tool.tsp";
 import "./_task.tsp";
 import "./_discovery_agent.tsp";
-import "./_foundry_v1_types.tsp";
+import "./.external-foundry/Azure.AI.Projects/_custom-types.tsp";
+import "./.external-foundry/Azure.AI.Projects/_common.tsp";
+import "./.external-foundry/Azure.AI.Projects/_servicepatterns.tsp";
+import "./.external-foundry/Azure.AI.Projects/tools/models.tsp";
+import "./.external-foundry/Azure.AI.Projects/responses/models.tsp";
+import "./.external-foundry/Azure.AI.Projects/agents/models.tsp";
 
 using TypeSpec.Http;
 using TypeSpec.Versioning;

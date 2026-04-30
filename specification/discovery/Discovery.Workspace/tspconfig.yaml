@@ -9,6 +9,7 @@ linter:
     - "@azure-tools/typespec-azure-rulesets/data-plane"
 imports:
   - "@azure-tools/openai-typespec/models/responses"
+  - "./.external-foundry/Azure.AI.Projects/_item_resource_type.tsp"
 options:
   "@azure-tools/typespec-autorest":
     emitter-output-dir: "{project-root}/.."
